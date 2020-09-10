@@ -52,25 +52,34 @@ You should be able to get by mostly only knowing the code in `main.c`.
 Please answer the following questions:
 
 - **Q1:** What happens when you run the system using polling?
+	We see that about one out of 5 units of work are one of the characters of "BOOP" @ 60 Boops/minute
 - **Q2:** What happens when you run the system using interrupts?
+	About one out of 25 units of work are used to print one of the characters of "BOOP" @ 60 Boops/minute
 - **Q3:** How can you explain the difference?
-	Please be specific.
+	In lines 78-93, we read the device register for boops every loop, which has a high time cost since checking the device register is an expensive operation, and most of the time, there is no data, meaning it is essentially wasting processing time.
 - **Q4:** A famous google interview question: How can you tell by which way a stack grows in C on your architecture?
 	Brainstorm this as a group and test it out.
+		The stack grows down, as seen by printing the addresses of 2 local variables in different functions (main.c:55)
 	Use what you learned from that exercise to figure out which stack the interrupt handler `dev_isr` is executing on.
 	Explain what you think is happening, and how that is possible?
 	In other words: how are stacks used with signals in Linux?
+		`dev_isr` executes on the same stack, as seen by the address of the local variable data declared at the beginning. Since a signal isn't an interrupt, but rather an emulated interupt, it uses the same stack as the function that called it.
+	
 - **Q5:** Use the meme device both modes.
 	What is happening here?
+	It prints out a lot of gibberish, parts of memes.
 	What solutions do you foresee?
-
-## Exercises: DMA
+	We need to find a way to stop the memes from interrupting themselves, otherwise our memes will simply be dreams.
+		
 
 Now lets hack in some DMA!
 
 - **Q1:** Only the meme device provides DMA.
 	Why?
+		The boop device only sends one byte of data, rather than many, so DMA does not provide much of a benefit
 	Why does DMA make more sense for the meme device?
+		A meme is many bytes that should all be read at the same time to make sense, which is why DMA is beneficial.
+
 - **Q2:** Not so much a question as a puzzle:
 	Implement the `main.c` code to use the DMA features of the meme device!
 	Note that there is a lot of documentation of the DMA functions.
