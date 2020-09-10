@@ -3,7 +3,7 @@
  * device, and if we use register I/O, or interrupt I/O. The mode
  * changes based on if you comment each line out or not.
  */
-#define BOOPDEV
+//#define BOOPDEV
 #define POLL_IO
 
 #include <stdio.h>
@@ -20,7 +20,7 @@ dev_isr(void)
 {
 	int ret;
 	char data;
-
+	//printf("\ndata: %p",&data);
 	assert(dev);
 	/* Read out, and print all of the data from the device! */
 	do {
@@ -43,10 +43,16 @@ dev_isr(void)
 #else
 #define DEV_ID FAUX_S_DEV_MEMES
 #endif
+int test(void){
+	int b = 1;
+	printf("b: %p\n",&b);
+	return 90;
+}
 
 int
 main(void)
 {
+	void** buffer[1024];
 	faux_s_interrupt_init();
 	faux_s_dev_init();
 
@@ -81,6 +87,8 @@ main(void)
 		/* Poll on the I/O to get our boops/memes */
 		do {
 			/* repetitively read all of the data on the device */
+			//char* buf[64];
+			//ret = faux_s_dev_dma_dequeue(dev,buffer);
 			ret = faux_s_dev_reg_read(dev, &data);
 			if (ret < 0) {
 				printf("Register read failure.\n");
